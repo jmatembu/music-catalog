@@ -6,17 +6,17 @@
 	let openRequest;
 	let db;
 
-	window.addEventListener('DOMContentLoaded', function (event) {
+	window.addEventListener('DOMContentLoaded', (event) => {
 
 		if ('indexedDB' in window) {
 			// Open request to the database
 			openRequest = window.indexedDB.open('music');
 			// There was an error opening the database
-			openRequest.onerror = function (event) {
+			openRequest.onerror = (event) => {
 				console.log(event.target.errorCode);
 			}
 			// Need to upgrade the database
-			openRequest.onupgradeneeded = function (event) {
+			openRequest.onupgradeneeded = (event) => {
 				
 				db = event.target.result;
 
@@ -35,7 +35,7 @@
 
 			// There is no need for a database upgrade
 			// So we shall just get the albums from the database.
-			openRequest.onsuccess = function (event) {
+			openRequest.onsuccess = (event) => {
 				
 				db = event.target.result;
 				
@@ -43,7 +43,7 @@
 					albumStore = transaction.objectStore('albums'),
 					getRequest = albumStore.getAll(); // All the albums
 
-				getRequest.onsuccess = function (event) {
+				getRequest.onsuccess = (event) => {
 					catalog = event.target.result;
 					loading.classList.add('hidden');
 					renderCatalog(catalog); // Show albums on to screen
@@ -64,7 +64,7 @@
 		var transaction = db.transaction('albums', 'readwrite');
 		var albumStore = transaction.objectStore('albums');
 
-		catalog.forEach(function (album) {
+		catalog.forEach((album) => {
 			albumStore.add(album);	
 		});
 
@@ -152,7 +152,7 @@
 		var req = new XMLHttpRequest();
 		var url = 'https://freemusicarchive.org/api/get/albums.json?api_key=CFEFES9JPKBN4T7H';	
 
-		req.onload = function () {
+		req.onload = () => {
 			
 			if (req.status === 200 && req.status < 400) {
 				catalog = JSON.parse(req.response).dataset;
@@ -162,10 +162,10 @@
 			}
 
 		}
-		req.timeout = function () {
+		req.timeout = () => {
 			loading.innerHTML = 'Server timed out. Please refresh the page.';
 		}
-		req.onerror = function () {
+		req.onerror = () => {
 			console.log(req.response);
 		}
 
