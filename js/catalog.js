@@ -6,7 +6,7 @@
 	let openRequest;
 	let db;
 
-	window.addEventListener('DOMContentLoaded', (event) => {
+	window.addEventListener('DOMContentLoaded', () => {
 
 		if ('indexedDB' in window) {
 			// Open request to the database
@@ -25,7 +25,7 @@
 					db.deleteObjectStore('albums');
 				}
 				// So we create it
-				var albumStore = db.createObjectStore('albums', {
+				db.createObjectStore('albums', {
 					keyPath: 'album_id'
 				});
 				// AJAX request for albums
