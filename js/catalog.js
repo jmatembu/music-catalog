@@ -5,6 +5,7 @@
 	let loading = document.querySelector('.loading');
 	let openRequest;
 	let db;
+	let url = 'https://freemusicarchive.org/api/get/albums.json?api_key=CFEFES9JPKBN4T7H';
 
 	window.addEventListener('DOMContentLoaded', () => {
 
@@ -28,9 +29,43 @@
 				db.createObjectStore('albums', {
 					keyPath: 'album_id'
 				});
-				// AJAX request for albums
-				getMusic(populateAlbums);
 
+				var requestPromise = new Promise((resolve, reject) => {
+				
+					// makeRequest(url); // AJAX request for albums
+					var req = new XMLHttpRequest();
+
+					req.onload = () => {
+
+						if (req.status === 200 && req.status < 400) {
+							catalog = JSON.parse(req.response).dataset;
+							resolve(catalog);
+						} else {
+							// loading.innerHTML = 'Problem loading music archive';
+							reject(req.responseText);
+						}
+
+					}
+					req.onerror = (error) => {
+						reject(error);
+					}
+
+					req.open('GET', url);
+					req.send();
+				});
+
+				requestPromise.then(
+					
+					(musicCatalog) => {
+
+						populateAlbums(musicCatalog);
+				
+					},
+					(error) => {
+						console.log(error);
+					}
+				);
+				
 			}
 
 			// There is no need for a database upgrade
@@ -147,29 +182,29 @@
 	 *
 	 * @param {Function} callback 
 	 */
-	function getMusic(callback) {
+	// function makeRequest(url, method = 'GET') {
 
-		var req = new XMLHttpRequest();
-		var url = 'https://freemusicarchive.org/api/get/albums.json?api_key=CFEFES9JPKBN4T7H';	
-
-		req.onload = () => {
+	// 	var req = new XMLHttpRequest();
 			
-			if (req.status === 200 && req.status < 400) {
-				catalog = JSON.parse(req.response).dataset;
-				callback();
-			} else {
-				loading.innerHTML = 'Problem loading music archive';
-			}
+	// 	req.onload = () => {
+			
+	// 		if (req.status === 200 && req.status < 400) {
+	// 			catalog = JSON.parse(req.response).dataset;
+	// 			resolve(catalog);
+	// 		} else {
+	// 			loading.innerHTML = 'Problem loading music archive';
+	// 			reject(req.responseText);
+	// 		}
 
-		}
-		req.timeout = () => {
-			loading.innerHTML = 'Server timed out. Please refresh the page.';
-		}
-		req.onerror = () => {
-			console.log(req.response);
-		}
+	// 	}
+	// 	req.timeout = () => {
+	// 		loading.innerHTML = 'Server timed out. Please refresh the page.';
+	// 	}
+	// 	req.onerror = (error) => {
+	// 		reject(error);
+	// 	}
 
-		req.open('GET', url);
-		req.send();
-	}
+	// 	req.open(method, url);
+	// 	req.send();
+	// }
 }());
